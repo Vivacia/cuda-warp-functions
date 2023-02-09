@@ -1,0 +1,46 @@
+For 1000 rounds:
+CUDA Warp Vote Benchmarks
+
+  Average time to run CUDA __all_sync() = 0.293889 ms
+  Average time to run custom all_sync() = 0.076142 ms
+
+  Average time to run CUDA __any_sync() = 0.054975 ms
+  Average time to run custom any_sync() = 0.055031 ms
+
+  Average time to run CUDA __ballot_sync() = 0.056238 ms
+  Average time to run custom ballot_sync() = 0.066781 ms
+
+  Average time to run CUDA __activemask() = 0.052344 ms
+  Average time to run custom activemask() = 0.064224 ms
+
+
+For 100 rounds:
+CUDA Warp Vote Benchmarks
+
+  Average time to run CUDA __all_sync() = 2.332070 ms
+  Average time to run custom all_sync() = 0.079210 ms
+
+  Average time to run CUDA __any_sync() = 0.056640 ms
+  Average time to run custom any_sync() = 0.056490 ms
+
+  Average time to run CUDA __ballot_sync() = 0.052410 ms
+  Average time to run custom ballot_sync() = 0.070240 ms
+
+  Average time to run CUDA __activemask() = 0.050190 ms
+  Average time to run custom activemask() = 0.065600 ms
+
+
+For 10 rounds:
+CUDA Warp Vote Benchmarks
+
+  Average time to run CUDA __all_sync() = 22.459400 ms
+  Average time to run custom all_sync() = 0.069700 ms
+
+  Average time to run CUDA __any_sync() = 0.048100 ms
+  Average time to run custom any_sync() = 0.052900 ms
+
+  Average time to run CUDA __ballot_sync() = 0.067000 ms
+  Average time to run custom ballot_sync() = 0.075600 ms
+
+  Average time to run CUDA __activemask() = 0.054500 ms
+  Average time to run custom activemask() = 0.062200 ms
