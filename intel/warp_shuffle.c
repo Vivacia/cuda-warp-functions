@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include "include/ze_api.h"
+#include <level_zero/ze_api.h>
 #include "include/ze_utils.h"
 
 int NUM_ROUNDS = 1;
