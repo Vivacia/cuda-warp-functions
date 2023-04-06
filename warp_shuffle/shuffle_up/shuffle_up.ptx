@@ -1,0 +1,539 @@
+__nv_save_fatbinhandle_for_managed_rt(void**):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        movq    %rdi, -8(%rbp)
+        movq    -8(%rbp), %rax
+        movq    %rax, __nv_fatbinhandle_for_managed_rt(%rip)
+        nop
+        popq    %rbp
+        ret
+dim3::dim3(unsigned int, unsigned int, unsigned int):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        movq    %rdi, -8(%rbp)
+        movl    %esi, -12(%rbp)
+        movl    %edx, -16(%rbp)
+        movl    %ecx, -20(%rbp)
+        movq    -8(%rbp), %rax
+        movl    -12(%rbp), %edx
+        movl    %edx, (%rax)
+        movq    -8(%rbp), %rax
+        movl    -16(%rbp), %edx
+        movl    %edx, 4(%rax)
+        movq    -8(%rbp), %rax
+        movl    -20(%rbp), %edx
+        movl    %edx, 8(%rax)
+        nop
+        popq    %rbp
+        ret
+shfl_up_sync(unsigned int, unsigned int, unsigned int, int):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $32, %rsp
+        movl    %edi, -20(%rbp)
+        movl    %esi, -24(%rbp)
+        movl    %edx, -28(%rbp)
+        movl    %ecx, -32(%rbp)
+        movl    $1, -4(%rbp)
+        movl    -4(%rbp), %eax
+        movl    %eax, %edi
+        call    exit
+.LC0:
+        .string "/app/example.cu"
+.LC1:
+        .string "CUDA error at %s %d: %s\n"
+benchmark_shfl_up_sync():
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $32, %rsp
+        leaq    -28(%rbp), %rax
+        movl    $1, %ecx
+        movl    $1, %edx
+        movl    $32, %esi
+        movq    %rax, %rdi
+        call    dim3::dim3(unsigned int, unsigned int, unsigned int)
+        leaq    -16(%rbp), %rax
+        movl    $1, %ecx
+        movl    $1, %edx
+        movl    $1, %esi
+        movq    %rax, %rdi
+        call    dim3::dim3(unsigned int, unsigned int, unsigned int)
+        movq    -28(%rbp), %rax
+        movl    -20(%rbp), %ecx
+        movq    %rcx, %rdx
+        movq    -16(%rbp), %rdi
+        movl    -8(%rbp), %esi
+        movl    $0, %r9d
+        movl    $0, %r8d
+        movq    %rdx, %rcx
+        movq    %rax, %rdx
+        call    __cudaPushCallConfiguration
+        testl   %eax, %eax
+        jne     .L5
+        call    test_shfl_up_sync_custom()
+.L5:
+        call    cudaDeviceSynchronize
+        movl    %eax, -4(%rbp)
+        cmpl    $0, -4(%rbp)
+        je      .L9
+        movl    -4(%rbp), %eax
+        movl    %eax, %edi
+        call    cudaGetErrorString
+        movq    %rax, %rcx
+        movl    $265, %edx
+        movl    $.LC0, %esi
+        movl    $.LC1, %edi
+        movl    $0, %eax
+        call    printf
+        movl    $1, %edi
+        call    exit
+        movq    %rax, %rdi
+        call    _Unwind_Resume
+.L9:
+        nop
+        leave
+        ret
+main:
+        pushq   %rbp
+        movq    %rsp, %rbp
+        call    benchmark_shfl_up_sync()
+        movl    $0, %eax
+        popq    %rbp
+        ret
+____nv_dummy_param_ref(void*):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        movq    %rdi, -8(%rbp)
+        movq    -8(%rbp), %rax
+        movq    %rax, ____nv_dummy_param_ref(void*)::__ref(%rip)
+        nop
+        popq    %rbp
+        ret
+__cudaUnregisterBinaryUtil():
+        pushq   %rbp
+        movq    %rsp, %rbp
+        movl    $__cudaFatCubinHandle, %edi
+        call    ____nv_dummy_param_ref(void*)
+        movq    __cudaFatCubinHandle(%rip), %rax
+        movq    %rax, %rdi
+        call    __cudaUnregisterFatBinary
+        nop
+        popq    %rbp
+        ret
+__nv_init_managed_rt_with_module(void**):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $16, %rsp
+        movq    %rdi, -8(%rbp)
+        movq    -8(%rbp), %rax
+        movq    %rax, %rdi
+        call    __cudaInitModule
+        leave
+        ret
+fatbinData:
+.quad 0x00100001ba55ed50,0x0000000000000608,0x0000007001010001,0x0000000000000598
+.quad 0x0000004000000592,0x0000005000070000,0x0000000f00000060,0x0000000000002011
+.quad 0x0000000000000000,0x0000000000000b1d,0x0000001600000048,0x72656e65672d2d20
+.quad 0x656e696c2d657461,0x0000206f666e692d,0x6178652f7070612f,0x0075632e656c706d
+.quad 0x762e1cf000010a13,0x37206e6f69737265,0x677261742e0a302e,0x30385f6d73207465
+.quad 0x7365726464612e0a,0x3620657a69735f73,0x6f6c6726fc002e34,0x696c612e206c6162
+.quad 0x38622e2034206e67,0x70755f6c66687320,0x68735f636e79735f,0x7261765f64657261
+.quad 0x3832315b7272615f,0x0037311e00373b5d,0x64657461647075cf,0x0300663b5d32335b
+.quad 0x6d6f7473756300f3,0x73746c757365725f,0x0bf9006103003e5f,0x6c62697369762e0a
+.quad 0x7972746e652e2065,0x73657434325a5f20,0xf300440200665f74,0x7b0a290a0a28760a
+.quad 0x702e206765722e0a,0x393c702520646572,0x363162a500123b3e,0x1330313c73722520
+.quad 0x6625203233668600,0x460011000024343c,0x36b0001233333c72,0x37313c6472252034
+.quad 0x6f6c03f1012a3b3e,0x2038323220312063,0x752e766f6d0a3631,0x7425202c31e30033
+.quad 0x6f6e0a3b782e6469,0x001a2c3920004874,0x2030339300353b15,0x0020646e610a3032
+.quad 0x24331600252c3222,0x0a3520353400f100,0x656469772e6c756d,0x2c3464320027732e
+.quad 0x0200723b34220062,0x0901a32c352f0093,0x732e6464610a3b72,0x0000312c3623002b
+.quad 0x7476630a3b50004d,0x25095a005f00001a,0x36344800a7376472,0xd42c382f00683520
+.quad 0x2c31230061090201,0x004a06004f00002a,0x20006e0000f03910,0x23007102016c6e72
+.quad 0x0200e70000703166,0x0017000109000182,0x0001304533663051,0x3632203382004403
+.quad 0x6d21004532312031,0x1000466611004669,0x03006c3219003433,0x27732e697a440027
+.quad 0x1500283031723000,0x3220303593002833,0x23015d7268730a31,0x00018500015d3131
+.quad 0x2c322301d0030017,0x0200ea393223001d,0x2300002f3313002f,0x34313301cc3b1700
+.quad 0x0a3b382d73001f2c,0x0030070031627573,0x3120338400853416,0x01003d6c68730a33
+.quad 0x0a331a00ab00019b,0x9701033574732302,0x2b5d1001cb5b1000,0x02d302020a321300
+.quad 0x380701bf202c313b,0x3731110037381100,0x3135200027731600,0x2c362200d9070108
+.quad 0x2500f0312d2900ae,0x00c0351b00c52c37,0x002c2c3823002607,0x19030602025f2d1e
+.quad 0x0a02303217023038,0xdc06004a39150160,0x160c006f34352001,0x1900310101da0103
+.quad 0x2602ed3317005c34,0x392032b200453031,0x746c2e707465730a,0x00f92c317033009b
+.quad 0x23005901014f3013,0x254001fa01623133,0x4220617262203170,0x00fe0a3b335f3042
+.quad 0x7225510163646c27,0x2b325201692c3273,0x7165b300683b5d33,0x327025093631732e
+.quad 0x150055301100212c,0xe50a024300005532,0x8d0201f1646c2800,0x342b334900570000
+.quad 0xdc202c333701f45d,0x01f50d003c351000,0xbd00007b01008c00,0x00323a1400c50100
+.quad 0x048b392031343258,0x00bd371702a83013,0x001f2c3323012501,0x31706c20001a3010
+.quad 0x03af327225094000,0xc5337028012f2c14,0x01473214024b0101,0x02bf361f1102d00f
+.quad 0x321f02bf3532242d,0x002c2c34230901f2,0x450084321301f20a,0x361f019d34702540
+.quad 0x2c01f235140d01f2,0x212c352301f25d32,0x01f2351601f20200,0x0249030e01f2311f
+.quad 0x0f02a60201f0331a,0x13012832120d01f0,0x0401f0361b01f036,0x3614010d7511010d
+.quad 0x381401da321a01da,0x36702801170001da,0x322b039f321101da,0x1f0a04ab0f01b438
+.quad 0xdc3033242d01dc39,0xaa020901dc341f01,0x7437150174301404,0x38130d01c9391f01
+.quad 0x2c382301c70d01c9,0xc73816005302001f,0x11019e0a3b303801,0x020c019e0f002339
+.quad 0x3917019c391300e8,0x720a31203673019c,0x3a32313a001a7465,0x752e6172627600b0
+.quad 0x2a0009010433696e,0x0019311400193a31,0x3b3023f30019301b,0x6c69662e0a0a7d0a
+.quad 0x70612f2220310965,0x6c706d6178652f70,0x31202c2275632e65,0x3536353531373736
+.quad 0x3739323731202c34,0x2f2220321ef2002d,0x706d6f632f74706f,0x7078652d72656c69
+.quad 0x75632f7265726f6c,0x2e302e31312f6164,0x2e2e2f6e69622f32,0x782f7307f10a642f
+.quad 0x696c2d34365f3638,0x6c636e692f78756e,0x5f06f10030656475,0x725f656369766564
+.quad 0x615f656d69746e75,0x3560007e682e6970,0x53026f3037323734,0x1f007e3037393431
+.quad 0x6363679606007e33,0x0060302e332e392d,0x634100122f2b2b32,0x3504f0005674616d
+.quad 0x3333353434393938, 0x0a3033313934202c, 0x000000000000000a
+
+__fatDeviceText:
+        .long   1180844977
+        .long   1
+        .quad   fatbinData
+        .quad   0
+__device_stub__Z24test_shfl_up_sync_customv():
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $64, %rsp
+        movl    $0, -4(%rbp)
+        movq    $test_shfl_up_sync_custom(), __device_stub__Z24test_shfl_up_sync_customv()::__f(%rip)
+        movl    $1, -28(%rbp)
+        movl    $1, -24(%rbp)
+        movl    $1, -20(%rbp)
+        movl    $1, -40(%rbp)
+        movl    $1, -36(%rbp)
+        movl    $1, -32(%rbp)
+        leaq    -56(%rbp), %rcx
+        leaq    -48(%rbp), %rdx
+        leaq    -40(%rbp), %rsi
+        leaq    -28(%rbp), %rax
+        movq    %rax, %rdi
+        call    __cudaPopCallConfiguration
+        testl   %eax, %eax
+        setne   %al
+        testb   %al, %al
+        jne     .L16
+        cmpl    $0, -4(%rbp)
+        jne     .L19
+        movq    -56(%rbp), %rdi
+        movq    -48(%rbp), %rsi
+        leaq    -16(%rbp), %rax
+        movl    -4(%rbp), %edx
+        movslq  %edx, %rdx
+        salq    $3, %rdx
+        leaq    (%rax,%rdx), %r9
+        movq    -40(%rbp), %rcx
+        movl    -32(%rbp), %r8d
+        movq    -28(%rbp), %rdx
+        movl    -20(%rbp), %eax
+        pushq   %rdi
+        pushq   %rsi
+        movq    %rdx, %rsi
+        movl    %eax, %edx
+        movl    $test_shfl_up_sync_custom(), %edi
+        call    cudaError cudaLaunchKernel<char>(char const*, dim3, dim3, void**, unsigned long, CUstream_st*)
+        addq    $16, %rsp
+        jmp     .L16
+.L19:
+        movq    -56(%rbp), %rdi
+        movq    -48(%rbp), %rsi
+        leaq    -16(%rbp), %r9
+        movq    -40(%rbp), %rcx
+        movl    -32(%rbp), %r8d
+        movq    -28(%rbp), %rdx
+        movl    -20(%rbp), %eax
+        pushq   %rdi
+        pushq   %rsi
+        movq    %rdx, %rsi
+        movl    %eax, %edx
+        movl    $test_shfl_up_sync_custom(), %edi
+        call    cudaError cudaLaunchKernel<char>(char const*, dim3, dim3, void**, unsigned long, CUstream_st*)
+        addq    $16, %rsp
+        jmp     .L16
+        movq    %rax, %rdi
+        call    _Unwind_Resume
+.L16:
+        leave
+        ret
+test_shfl_up_sync_custom():
+        pushq   %rbp
+        movq    %rsp, %rbp
+        call    __device_stub__Z24test_shfl_up_sync_customv()
+        nop
+        popq    %rbp
+        ret
+.LC2:
+        .string "test_shfl_up_sync_custom()"
+.LC3:
+        .string "shfl_up_sync_shared_var_arr"
+.LC4:
+        .string "shfl_up_sync_updated"
+.LC5:
+        .string "custom_results_shfl_up"
+__nv_cudaEntityRegisterCallback(void**):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $16, %rsp
+        movq    %rdi, -8(%rbp)
+        movq    -8(%rbp), %rax
+        movq    %rax, __nv_cudaEntityRegisterCallback(void**)::__ref(%rip)
+        movq    -8(%rbp), %rax
+        movq    %rax, %rdi
+        call    __nv_save_fatbinhandle_for_managed_rt(void**)
+        movq    -8(%rbp), %rax
+        pushq   $0
+        pushq   $0
+        pushq   $0
+        pushq   $0
+        movl    $0, %r9d
+        movl    $-1, %r8d
+        movl    $.LC2, %ecx
+        movl    $.LC2, %edx
+        movl    $test_shfl_up_sync_custom(), %esi
+        movq    %rax, %rdi
+        call    __cudaRegisterFunction
+        addq    $32, %rsp
+        movq    -8(%rbp), %rax
+        pushq   $0
+        pushq   $0
+        movl    $128, %r9d
+        movl    $0, %r8d
+        movl    $.LC3, %ecx
+        movl    $.LC3, %edx
+        movl    $_ZL27shfl_up_sync_shared_var_arr, %esi
+        movq    %rax, %rdi
+        call    __cudaRegisterVar
+        addq    $16, %rsp
+        movq    -8(%rbp), %rax
+        pushq   $0
+        pushq   $0
+        movl    $32, %r9d
+        movl    $0, %r8d
+        movl    $.LC4, %ecx
+        movl    $.LC4, %edx
+        movl    $_ZL20shfl_up_sync_updated, %esi
+        movq    %rax, %rdi
+        call    __cudaRegisterVar
+        addq    $16, %rsp
+        movq    -8(%rbp), %rax
+        pushq   $0
+        pushq   $0
+        movl    $128, %r9d
+        movl    $0, %r8d
+        movl    $.LC5, %ecx
+        movl    $.LC5, %edx
+        movl    $_ZL22custom_results_shfl_up, %esi
+        movq    %rax, %rdi
+        call    __cudaRegisterVar
+        addq    $16, %rsp
+        nop
+        leave
+        ret
+__sti____cudaRegisterAll():
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $16, %rsp
+        movl    $__fatDeviceText, %edi
+        call    __cudaRegisterFatBinary
+        movq    %rax, __cudaFatCubinHandle(%rip)
+        movq    $__nv_cudaEntityRegisterCallback(void**), -8(%rbp)
+        movq    __cudaFatCubinHandle(%rip), %rax
+        movq    -8(%rbp), %rdx
+        movq    %rax, %rdi
+        call    *%rdx
+        movq    __cudaFatCubinHandle(%rip), %rax
+        movq    %rax, %rdi
+        call    __cudaRegisterFatBinaryEnd
+        movl    $__cudaUnregisterBinaryUtil(), %edi
+        call    atexit
+        nop
+        leave
+        ret
+cudaError cudaLaunchKernel<char>(char const*, dim3, dim3, void**, unsigned long, CUstream_st*):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $48, %rsp
+        movq    %rdi, -8(%rbp)
+        movq    %rcx, %rax
+        movl    %r8d, %ecx
+        movq    %r9, -48(%rbp)
+        movq    %rsi, -24(%rbp)
+        movl    %edx, -16(%rbp)
+        movq    %rax, -40(%rbp)
+        movl    %ecx, -32(%rbp)
+        movq    -48(%rbp), %r8
+        movq    -40(%rbp), %rcx
+        movl    -32(%rbp), %edi
+        movq    -24(%rbp), %rsi
+        movl    -16(%rbp), %edx
+        movq    -8(%rbp), %rax
+        pushq   24(%rbp)
+        pushq   16(%rbp)
+        movq    %r8, %r9
+        movl    %edi, %r8d
+        movq    %rax, %rdi
+        call    cudaLaunchKernel
+        addq    $16, %rsp
+        leave
+        ret
+
+// #include <cstdio>
+// #include <stdio.h>
+// #include <cstdlib>
+// #include <math.h>
+// #include <sys/time.h>
+
+// __device__ unsigned shfl_up_sync_shared_var_arr[32];
+// __device__ bool shfl_up_sync_updated[32] = {0, 0, 0, 0, 0, 0,
+// 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0,
+// 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+// 0, 0, 0, 0};
+
+// __device__ unsigned shfl_up_sync(unsigned mask, unsigned var, unsigned int delta, int width=warpSize) {
+//     int tid = threadIdx.x;
+
+//     shfl_up_sync_shared_var_arr[tid] = var;
+//     shfl_up_sync_updated[tid] = true;
+
+//     if (((0x1 << tid) & mask) != 0) {
+//         int sub_id = floor((float) tid / (float) width); // subsection
+//         int sub_tid = tid % width;
+//         int srcLane = sub_tid - delta;
+//         if (srcLane >= 0) {
+//             while(!shfl_up_sync_updated[srcLane + (width * sub_id)]);
+//             var = shfl_up_sync_shared_var_arr[srcLane + (width * sub_id)];
+//             shfl_up_sync_updated[srcLane + (width * sub_id)] = false; // reset
+//         }
+//     }
+//     return var;
+// }
+
+
+
+__nv_save_fatbinhandle_for_managed_rt(void**):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        movq    %rdi, -8(%rbp)
+        movq    -8(%rbp), %rax
+        movq    %rax, __nv_fatbinhandle_for_managed_rt(%rip)
+        nop
+        popq    %rbp
+        ret
+shfl_up_sync(unsigned int, unsigned int, unsigned int, int):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $32, %rsp
+        movl    %edi, -20(%rbp)
+        movl    %esi, -24(%rbp)
+        movl    %edx, -28(%rbp)
+        movl    %ecx, -32(%rbp)
+        movl    $1, -4(%rbp)
+        movl    -4(%rbp), %eax
+        movl    %eax, %edi
+        call    exit
+____nv_dummy_param_ref(void*):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        movq    %rdi, -8(%rbp)
+        movq    -8(%rbp), %rax
+        movq    %rax, ____nv_dummy_param_ref(void*)::__ref(%rip)
+        nop
+        popq    %rbp
+        ret
+__cudaUnregisterBinaryUtil():
+        pushq   %rbp
+        movq    %rsp, %rbp
+        movl    $__cudaFatCubinHandle, %edi
+        call    ____nv_dummy_param_ref(void*)
+        movq    __cudaFatCubinHandle(%rip), %rax
+        movq    %rax, %rdi
+        call    __cudaUnregisterFatBinary
+        nop
+        popq    %rbp
+        ret
+__nv_init_managed_rt_with_module(void**):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $16, %rsp
+        movq    %rdi, -8(%rbp)
+        movq    -8(%rbp), %rax
+        movq    %rax, %rdi
+        call    __cudaInitModule
+        leave
+        ret
+fatbinData:
+.quad 0x00100001ba55ed50,0x00000000000001c8,0x0000007001010001,0x0000000000000158
+.quad 0x0000004000000157,0x0000005000070000,0x0000000f00000060,0x0000000000002011
+.quad 0x0000000000000000,0x000000000000019f,0x0000001600000048,0x72656e65672d2d20
+.quad 0x656e696c2d657461,0x0000206f666e692d,0x6178652f7070612f,0x0075632e656c706d
+.quad 0x762e54fc00010a13,0x37206e6f69737265,0x677261742e0a302e,0x30385f6d73207465
+.quad 0x7365726464612e0a,0x3620657a69735f73,0x626f6c672e0a0a34,0x67696c612e206c61
+.quad 0x2038622e2034206e,0x5f70755f6c666873,0x6168735f636e7973,0x5f7261765f646572
+.quad 0x5d3832315b727261,0xf30037311e00373b,0x646574616470752b,0x2e0a0a3b5d32335b
+.quad 0x22203109656c6966,0x6178652f7070612f,0x2275632e656c706d,0x353137373631202c
+.quad 0x3731202c37383236,0x321ef2002d363134,0x632f74706f2f2220,0x2d72656c69706d6f
+.quad 0x7265726f6c707865,0x31312f616475632f,0x6e69622f322e302e,0x07f100e62f2e2e2f
+.quad 0x34365f3638782f73,0x692f78756e696c2d,0x00306564756c636e,0x63697665645f06f1
+.quad 0x6d69746e75725f65,0x7e682e6970615f65,0x373237343500f300,0x393431202c323330
+.quad 0x007e331f007e3037,0x2e392d6363679606,0x2b2b320060302e33,0x74616d634100122f
+.quad 0x3939383504f00056, 0x34202c3333353434, 0x00000a0a30333139
+
+__fatDeviceText:
+        .long   1180844977
+        .long   1
+        .quad   fatbinData
+        .quad   0
+.LC0:
+        .string "shfl_up_sync_shared_var_arr"
+.LC1:
+        .string "shfl_up_sync_updated"
+__nv_cudaEntityRegisterCallback(void**):
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $16, %rsp
+        movq    %rdi, -8(%rbp)
+        movq    -8(%rbp), %rax
+        movq    %rax, __nv_cudaEntityRegisterCallback(void**)::__ref(%rip)
+        movq    -8(%rbp), %rax
+        movq    %rax, %rdi
+        call    __nv_save_fatbinhandle_for_managed_rt(void**)
+        movq    -8(%rbp), %rax
+        pushq   $0
+        pushq   $0
+        movl    $128, %r9d
+        movl    $0, %r8d
+        movl    $.LC0, %ecx
+        movl    $.LC0, %edx
+        movl    $_ZL27shfl_up_sync_shared_var_arr, %esi
+        movq    %rax, %rdi
+        call    __cudaRegisterVar
+        addq    $16, %rsp
+        movq    -8(%rbp), %rax
+        pushq   $0
+        pushq   $0
+        movl    $32, %r9d
+        movl    $0, %r8d
+        movl    $.LC1, %ecx
+        movl    $.LC1, %edx
+        movl    $_ZL20shfl_up_sync_updated, %esi
+        movq    %rax, %rdi
+        call    __cudaRegisterVar
+        addq    $16, %rsp
+        nop
+        leave
+        ret
+__sti____cudaRegisterAll():
+        pushq   %rbp
+        movq    %rsp, %rbp
+        subq    $16, %rsp
+        movl    $__fatDeviceText, %edi
+        call    __cudaRegisterFatBinary
+        movq    %rax, __cudaFatCubinHandle(%rip)
+        movq    $__nv_cudaEntityRegisterCallback(void**), -8(%rbp)
+        movq    __cudaFatCubinHandle(%rip), %rax
+        movq    -8(%rbp), %rdx
+        movq    %rax, %rdi
+        call    *%rdx
+        movq    __cudaFatCubinHandle(%rip), %rax
+        movq    %rax, %rdi
+        call    __cudaRegisterFatBinaryEnd
+        movl    $__cudaUnregisterBinaryUtil(), %edi
+        call    atexit
+        nop
+        leave
+        ret
