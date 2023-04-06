@@ -1,7 +1,9 @@
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
 #include <stdio.h>
+#include <cstdlib>
+#include <math.h>
 #include <sys/time.h>
+#include <time.h>
 #include <level_zero/ze_api.h>
 #include "../include/ze_utils.h"
 
@@ -130,165 +132,141 @@ int main(int argc, char* argv[]) {
 
 
     // MODULE
-    unsigned char* program_file_up; size_t program_size_up;
-    errno = read_from_binary(&program_file_up, &program_size_up, "shfl_up.ar");
+    unsigned char* program_file_all; size_t program_size_all;
+    errno = read_from_binary(&program_file_all, &program_size_all, "match_all_sync.ar");
     check_error(errno, "read_from_binary");
 
-    unsigned char* program_file_down; size_t program_size_down;
-    errno = read_from_binary(&program_file_down, &program_size_down, "shfl_down.ar");
-    check_error(errno, "read_from_binary");
-
-    unsigned char* program_file_xor; size_t program_size_xor;
-    errno = read_from_binary(&program_file_xor, &program_size_xor, "shfl_xor.ar");
-    check_error(errno, "read_from_binary");
-
-    unsigned char* program_file_d; size_t program_size_d;
-    errno = read_from_binary(&program_file_d, &program_size_d, "shfl_d.ar");
+    unsigned char* program_file_any; size_t program_size_any;
+    errno = read_from_binary(&program_file_any, &program_size_any, "match_any_sync.ar");
     check_error(errno, "read_from_binary");
 
     // OpenCL C kernel has been compiled to Gen Binary
-    ze_module_desc_t moduleDescUp = {
+    ze_module_desc_t moduleDescAll = {
         ZE_STRUCTURE_TYPE_MODULE_DESC,
         NULL,
         ZE_MODULE_FORMAT_NATIVE,
-        program_size_up,
-        program_file_up,
+        program_size_all,
+        program_file_all,
         NULL,
         NULL
     };
-    ze_module_handle_t hModuleUp;
-    errno = zeModuleCreate(hContext, hDevice, &moduleDescUp, &hModuleUp, NULL);
+    ze_module_handle_t hModuleAll;
+    errno = zeModuleCreate(hContext, hDevice, &moduleDescAll, &hModuleAll, NULL);
 
-    ze_module_desc_t moduleDescDown = {
+    ze_module_desc_t moduleDescAny = {
         ZE_STRUCTURE_TYPE_MODULE_DESC,
         NULL,
         ZE_MODULE_FORMAT_NATIVE,
-        program_size_down,
-        program_file_down,
+        program_size_any,
+        program_file_any,
         NULL,
         NULL
     };
-    ze_module_handle_t hModuleDown;
-    errno = zeModuleCreate(hContext, hDevice, &moduleDescDown, &hModuleDown, NULL);
-
-    ze_module_desc_t moduleDescXor = {
-        ZE_STRUCTURE_TYPE_MODULE_DESC,
-        NULL,
-        ZE_MODULE_FORMAT_NATIVE,
-        program_size_xor,
-        program_file_xor,
-        NULL,
-        NULL
-    };
-    ze_module_handle_t hModuleXor;
-    errno = zeModuleCreate(hContext, hDevice, &moduleDescXor, &hModuleXor, NULL);
-
-    ze_module_desc_t moduleDescD = {
-        ZE_STRUCTURE_TYPE_MODULE_DESC,
-        NULL,
-        ZE_MODULE_FORMAT_NATIVE,
-        program_size_d,
-        program_file_d,
-        NULL,
-        NULL
-    };
-    ze_module_handle_t hModuleD;
-    errno = zeModuleCreate(hContext, hDevice, &moduleDescD, &hModuleD, NULL);
-    check_error(errno, "zeModuleCreate");
+    ze_module_handle_t hModuleAny;
+    errno = zeModuleCreate(hContext, hDevice, &moduleDescAny, &hModuleAny, NULL);
 
 
     // KERNEL
-    ze_kernel_desc_t kernelDescUp = {
+    ze_kernel_desc_t kernelDescAllTrue = {
         ZE_STRUCTURE_TYPE_KERNEL_DESC,
         NULL,
         0, // flags
-        "test_shfl_up_sync_custom"
+        "test_match_all_sync_custom_true"
     };
 
-    ze_kernel_desc_t kernelDescDown = {
+    ze_kernel_desc_t kernelDescAllFalse = {
         ZE_STRUCTURE_TYPE_KERNEL_DESC,
         NULL,
         0, // flags
-        "test_shfl_down_sync_custom"
+        "test_match_all_sync_custom_false"
     };
 
-    ze_kernel_desc_t kernelDescD = {
+    ze_kernel_desc_t kernelDescAnySimple = {
         ZE_STRUCTURE_TYPE_KERNEL_DESC,
         NULL,
         0, // flags
-        "test_shfl_sync_custom"
+        "test_match_any_sync_custom_simple"
     };
 
-    ze_kernel_desc_t kernelDescXor = {
+    ze_kernel_desc_t kernelDescAnyAlternate = {
         ZE_STRUCTURE_TYPE_KERNEL_DESC,
         NULL,
         0, // flags
-        "test_shfl_xor_sync_custom"
+        "test_match_any_sync_custom_alternate"
+    };
+
+    ze_kernel_desc_t kernelDescAnyUnique = {
+        ZE_STRUCTURE_TYPE_KERNEL_DESC,
+        NULL,
+        0, // flags
+        "test_match_any_sync_custom_unique"
     };
 
     uint32_t groupSizeX =  (uint32_t) atoi(argv[1]);
     uint32_t numGroupsX =  (uint32_t) atoi(argv[2]);
-    ze_kernel_handle_t hKernelUp, hKernelDown, hKernelXor, hKernelD;
-
-    unsigned shfl_up_sync_shared_var_arr[32];
-    unsigned shfl_up_sync_updated[32] = {0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0};
-
-    unsigned shfl_down_sync_shared_var_arr[32];
-    unsigned shfl_down_sync_updated[32] = {0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0};
-
-    unsigned shfl_sync_shared_var_arr[32];
-    unsigned shfl_sync_updated[32] = {0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0};
-
-    unsigned shfl_xor_sync_shared_var_arr[32];
-    unsigned shfl_xor_sync_updated[32] = {0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0};
+    ze_kernel_handle_t hKernelAllTrue, hKernelAllFalse, hKernelAnySimple, hKernelAnyAlternate, hKernelAnyUnique;
 
 
-    errno = zeKernelCreate(hModuleUp, &kernelDescUp, &hKernelUp);
+    int match_all_sync_shared_var_arr_true[32];
+    int match_all_sync_updated_true[32] = {0};
+
+    int match_all_sync_shared_var_arr_false[32];
+    int match_all_sync_updated_false[32] = {0};
+
+    int match_any_sync_shared_var_arr_simple[32];
+    int match_any_sync_updated_simple[32] = {0};
+
+    int match_any_sync_shared_var_arr_alternate[32];
+    int match_any_sync_updated_alternate[32] = {0};
+
+    int match_any_sync_shared_var_arr_unique[32];
+    int match_any_sync_updated_unique[32] = {0};
+
+    errno = zeKernelCreate(hModuleAll, &kernelDescAllTrue, &hKernelAllTrue);
     check_error(errno, "zeKernelCreate");
 
-    errno = zeKernelCreate(hModuleDown, &kernelDescDown, &hKernelDown);
+    errno = zeKernelCreate(hModuleAll, &kernelDescAllFalse, &hKernelAllFalse);
     check_error(errno, "zeKernelCreate");
 
-    errno = zeKernelCreate(hModuleXor, &kernelDescXor, &hKernelXor);
+    errno = zeKernelCreate(hModuleAny, &kernelDescAnySimple, &hKernelAnySimple);
     check_error(errno, "zeKernelCreate");
 
-    errno = zeKernelCreate(hModuleD, &kernelDescD, &hKernelD);
+    errno = zeKernelCreate(hModuleAny, &kernelDescAnyAlternate, &hKernelAnyAlternate);
+    check_error(errno, "zeKernelCreate");
+
+    errno = zeKernelCreate(hModuleAny, &kernelDescAnyUnique, &hKernelAnyUnique);
     check_error(errno, "zeKernelCreate");
 
     ze_group_count_t launchArgs = { numGroupsX, 1, 1 };
+    srand(time(0));
+    int arg = rand() % 1000;
     // Append launch kernel
-    zeKernelSetArgumentValue(hKernelUp, 0, sizeof(unsigned)*32, shfl_up_sync_shared_var_arr);
-    zeKernelSetArgumentValue(hKernelUp, 1, sizeof(unsigned)*32, shfl_up_sync_updated);
-    zeKernelSetGroupSize(hKernelUp, groupSizeX, 1, 1);
+    zeKernelSetArgumentValue(hKernelAllTrue, 0, sizeof(int), arg);
+    zeKernelSetArgumentValue(hKernelAllTrue, 1, sizeof(int)*32, match_all_sync_shared_var_arr_true);
+    zeKernelSetArgumentValue(hKernelAllTrue, 2, sizeof(int)*32, match_all_sync_updated_true);
+    zeKernelSetGroupSize(hKernelAllTrue, groupSizeX, 1, 1);
 
-    zeKernelSetArgumentValue(hKernelDown, 0, sizeof(unsigned)*32, shfl_down_sync_shared_var_arr);
-    zeKernelSetArgumentValue(hKernelDown, 1, sizeof(unsigned)*32, shfl_down_sync_updated);
-    zeKernelSetGroupSize(hKernelDown, groupSizeX, 1, 1);
+    zeKernelSetArgumentValue(hKernelAllFalse, 0, sizeof(int)*32, match_all_sync_shared_var_arr_false);
+    zeKernelSetArgumentValue(hKernelAllFalse, 1, sizeof(int)*32, match_all_sync_updated_false);
+    zeKernelSetGroupSize(hKernelAllFalse, groupSizeX, 1, 1);
 
-    zeKernelSetArgumentValue(hKernelXor, 0, sizeof(unsigned)*32, shfl_xor_sync_shared_var_arr);
-    zeKernelSetArgumentValue(hKernelXor, 1, sizeof(unsigned)*32, shfl_xor_sync_updated);
-    zeKernelSetGroupSize(hKernelXor, groupSizeX, 1, 1);
+    zeKernelSetArgumentValue(hKernelAnySimple, 0, sizeof(int)*32, match_any_sync_shared_var_arr_simple);
+    zeKernelSetArgumentValue(hKernelAnySimple, 1, sizeof(int)*32, match_any_sync_updated_simple);
+    zeKernelSetGroupSize(hKernelAnySimple, groupSizeX, 1, 1);
 
-    zeKernelSetArgumentValue(hKernelD, 0, sizeof(unsigned)*32, shfl_sync_shared_var_arr);
-    zeKernelSetArgumentValue(hKernelD, 1, sizeof(unsigned)*32, shfl_sync_updated);
-    zeKernelSetGroupSize(hKernelD, groupSizeX, 1, 1);
+    zeKernelSetArgumentValue(hKernelAnyAlternate, 0, sizeof(int)*32, match_any_sync_shared_var_arr_alternate);
+    zeKernelSetArgumentValue(hKernelAnyAlternate, 1, sizeof(int)*32, match_any_sync_updated_alternate);
+    zeKernelSetGroupSize(hKernelAnyAlternate, groupSizeX, 1, 1);
 
-    zeCommandListAppendLaunchKernel(hCommandList, hKernelUp, &launchArgs, NULL, 0, NULL);
-    zeCommandListAppendLaunchKernel(hCommandList, hKernelDown, &launchArgs, NULL, 0, NULL);
-    zeCommandListAppendLaunchKernel(hCommandList, hKernelXor, &launchArgs, NULL, 0, NULL);
-    zeCommandListAppendLaunchKernel(hCommandList, hKernelD, &launchArgs, NULL, 0, NULL);
+    zeKernelSetArgumentValue(hKernelAnyUnique, 0, sizeof(int)*32, match_any_sync_shared_var_arr_unique);
+    zeKernelSetArgumentValue(hKernelAnyUnique, 1, sizeof(int)*32, match_any_sync_updated_unique);
+    zeKernelSetGroupSize(hKernelAnyUnique, groupSizeX, 1, 1);
+
+    zeCommandListAppendLaunchKernel(hCommandList, hKernelAllTrue, &launchArgs, NULL, 0, NULL);
+    zeCommandListAppendLaunchKernel(hCommandList, hKernelAllFalse, &launchArgs, NULL, 0, NULL);
+    zeCommandListAppendLaunchKernel(hCommandList, hKernelAnySimple, &launchArgs, NULL, 0, NULL);
+    zeCommandListAppendLaunchKernel(hCommandList, hKernelAnyAlternate, &launchArgs, NULL, 0, NULL);
+    zeCommandListAppendLaunchKernel(hCommandList, hKernelAnyUnique, &launchArgs, NULL, 0, NULL);
 
     // finished appending commands (typically done on another thread)
     errno = zeCommandListClose(hCommandList);
@@ -314,37 +292,40 @@ int main(int argc, char* argv[]) {
         + end_custom.tv_usec-start_custom.tv_usec)/1000.0;
     total_custom_time += duration_custom;
 
-    double avg_custom_up = total_custom_time / NUM_ROUNDS;
+    double avg_custom_all = total_custom_time / NUM_ROUNDS;
 
-    printf("  Time to run custom shfl = %f ms\n\n", avg_custom_up);
-    // printf("  Average time to run custom shfl_down_sync() = %f ms\n\n", avg_custom_down);
-    // printf("  Average time to run custom shfl_sync() = %f ms\n\n", avg_custom_d);
-    // printf("  Average time to run custom shfl_xor_sync() = %f ms\n\n", avg_custom_xor);
+    printf("  Time to run custom match = %f ms\n\n", avg_custom_all);
 
 
     // CLEANING
-    errno = zeKernelDestroy(hKernelUp);
+    errno = zeKernelDestroy(hKernelAllTrue);
     check_error(errno, "zeKernelDestroy");
 
-    errno = zeKernelDestroy(hKernelDown);
+    errno = zeKernelDestroy(hKernelAllFalse);
     check_error(errno, "zeKernelDestroy");
 
-    errno = zeKernelDestroy(hKernelXor);
+    errno = zeKernelDestroy(hKernelAnySimple);
     check_error(errno, "zeKernelDestroy");
 
-    errno = zeKernelDestroy(hKernelD);
+    errno = zeKernelDestroy(hKernelAnyAlternate);
     check_error(errno, "zeKernelDestroy");
 
-    errno = zeModuleDestroy(hModuleUp);
+    errno = zeKernelDestroy(hKernelAnyUnique);
+    check_error(errno, "zeKernelDestroy");
+
+    errno = zeModuleDestroy(hModuleAllTrue);
     check_error(errno, "zeModuleDestroy");
 
-    errno = zeModuleDestroy(hModuleDown);
+    errno = zeModuleDestroy(hModuleAllFalse);
     check_error(errno, "zeModuleDestroy");
 
-    errno = zeModuleDestroy(hModuleXor);
+    errno = zeModuleDestroy(hModuleAnySimple);
     check_error(errno, "zeModuleDestroy");
 
-    errno = zeModuleDestroy(hModuleD);
+    errno = zeModuleDestroy(hModuleAnyAlternate);
+    check_error(errno, "zeModuleDestroy");
+
+    errno = zeModuleDestroy(hModuleAnyUnique);
     check_error(errno, "zeModuleDestroy");
 
     errno =  zeCommandListDestroy(hCommandList);

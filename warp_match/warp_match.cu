@@ -219,11 +219,8 @@ __global__ void test_match_any_sync_custom_unique() {
 void benchmark_match_any_sync() {
     double total_default_time = 0;
     double total_custom_time = 0;
-    srand(time(0));
 
     for (int i = 0; i < NUM_ROUNDS; i++) {
-        int arg = rand() % 1000;
-
         struct timeval start_default, end_default;
         gettimeofday(&start_default, 0);
         test_match_any_sync_default_simple<<< 1, 32 >>>();

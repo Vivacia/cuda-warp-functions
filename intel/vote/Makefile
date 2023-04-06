@@ -1,30 +1,27 @@
 CC=gcc
 CFLAGS=-g -O2 -lze_loader -Wall
-BINARIES=shfl shfl_up.ar shfl_down.ar shfl_d.ar shfl_xor.ar
+BINARIES=vote all_sync.ar any_sync.ar ballot_sync.ar activemask.ar
 all: $(BINARIES)
 
 run: $(addprefix run_, $(BINARIES))
 
 clean:
-        rm -f -- $(BINARIES) shfl
+        rm -f -- $(BINARIES) vote
 
-run_shfl: shfl
-            ./$<
-
-shfl_up.ar: opencl/shfl_up.cl
+all_sync.ar: opencl/all_sync.cl
         ocloc compile -file $^ -device \*
 
-shfl_down.ar: opencl/shfl_down.cl
+any_sync.ar: opencl/any_sync.cl
         ocloc compile -file $^ -device \*
 
-shfl_xor.ar: opencl/shfl_xor.cl
+ballot_sync.ar: opencl/ballot_sync.cl
         ocloc compile -file $^ -device \*
 
-shfl_d.ar: opencl/shfl_d.cl
+activemask.ar: opencl/activemask.cl
         ocloc compile -file $^ -device \*
 
-shfl: warp_shuffle.c ze_utils.c
+vote: warp_vote.c ze_utils.c
                 $(CC) $^ $(CFLAGS) -o $@
 
-run_shfl: shfl
+run_vote: vote
                 ./$< 10 1
