@@ -10,9 +10,9 @@ __kernel void reduce_add_sync(unsigned mask, unsigned value,
         reduce_add_sync_updated[tid] = true;
     }
 
-    __syncthreads();
+    barrier(CLK_LOCAL_MEM_FENCE);
 
-    for (int i = 0; i < warpSize; i++) {
+    for (int i = 0; i < 32; i++) {
         if (reduce_add_sync_updated[i]) {
             ret += reduce_add_sync_shared_var_arr[i];
             reduce_add_sync_updated[i] = false; // reset

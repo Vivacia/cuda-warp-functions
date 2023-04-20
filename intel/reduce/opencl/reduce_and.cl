@@ -10,7 +10,7 @@ __kernel void reduce_and_sync(unsigned mask, unsigned value,
         reduce_and_sync_updated[tid] = true;
     }
 
-    __syncthreads();
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     for (int i = 0; i < 32; i++) {
         if (reduce_and_sync_updated[i]) {
