@@ -1,4 +1,5 @@
-__kernel unsigned ballot_sync(unsigned mask, int predicate, __local int ballot_sync_shared_var_arr[],
+__kernel unsigned ballot_sync(unsigned mask, int predicate,
+    __local int ballot_sync_shared_var_arr[],
     __local int ballot_sync_updated[], __local unsigned* val) {
     int tid = get_global_id(0);
     int ret = 0;
