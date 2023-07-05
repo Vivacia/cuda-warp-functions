@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
     check_error(errno, "read_from_binary");
 
     unsigned char* program_file_min; size_t program_size_min;
-    errno = read_from_binary(&program_file_down, &program_size_min, "reduce_min.ar");
+    errno = read_from_binary(&program_file_min, &program_size_min, "reduce_min.ar");
     check_error(errno, "read_from_binary");
 
     unsigned char* program_file_max; size_t program_size_max;
@@ -284,10 +284,11 @@ int main(int argc, char* argv[]) {
         0, 0, 0, 0};
 
     unsigned test_arr_add[32];
-    unsigned res_add = 0;
+    unsigned res_add[1];
+    *res_add = 0;
     for (unsigned ii = 0; ii < 32; ii++) {
         test_arr_add[ii] = rand() % 100;
-        res_add += test_arr_add[ii];
+        *res_add += test_arr_add[ii];
     }
 
     unsigned reduce_min_sync_shared_var_arr[32];
@@ -298,11 +299,12 @@ int main(int argc, char* argv[]) {
     
     unsigned test_arr_min[32];
     test_arr_min[0] = rand() % 1000;
-    unsigned res_min = test_arr_min[0];
+    unsigned res_min[1];
+    *res_min = test_arr_min[0];
     for (unsigned ii = 1; ii < 32; ii++) {
         test_arr_min[ii] = rand() % 1000;
-        if (test_arr_min[ii] < res_min) {
-            res_min = test_arr_min[ii];
+        if (test_arr_min[ii] < *res_min) {
+            *res_min = test_arr_min[ii];
         }
     }
 
@@ -314,11 +316,12 @@ int main(int argc, char* argv[]) {
     
     unsigned test_arr_max[32];
     test_arr_max[0] = rand() % 1000;
-    unsigned res_max = test_arr_max[0] ;
+    unsigned res_max[1];
+    *res_max = test_arr_max[0] ;
     for (int ii = 1; ii < 32; ii++) {
         test_arr_max[ii] = rand() % 1000;
-        if (test_arr_max[ii] > res_max) {
-            res_max = test_arr_max[ii];
+        if (test_arr_max[ii] > *res_max) {
+            *res_max = test_arr_max[ii];
         }
     }
 
@@ -329,10 +332,11 @@ int main(int argc, char* argv[]) {
         0, 0, 0, 0};
     
     unsigned test_arr_and[32];
-    unsigned res_and = ~0x0;
+    unsigned res_and[1];
+    *res_and = ~0x0;
     for (int ii = 0; ii < 32; ii++) {
         test_arr_and[ii] = rand() % 1000;
-        res_and &= test_arr_and[ii];
+        *res_and &= test_arr_and[ii];
     }
 
     unsigned reduce_or_sync_shared_var_arr[32];
@@ -342,10 +346,11 @@ int main(int argc, char* argv[]) {
         0, 0, 0, 0};
 
     unsigned test_arr_or[32];
-    unsigned res_or = 0;
+    unsigned res_or[1];
+    *res_or = 0;
     for (int ii = 0; ii < 32; ii++) {
         test_arr_or[ii] = rand() % 1000;
-        res_or |= test_arr_or[ii];
+        *res_or |= test_arr_or[ii];
     }
     
     unsigned reduce_xor_sync_shared_var_arr[32];
@@ -356,10 +361,11 @@ int main(int argc, char* argv[]) {
     
     unsigned test_arr_xor[32];
     test_arr_xor[0] = rand() % 1000;
-    unsigned res_xor = test_arr_xor[0];
+    unsigned res_xor[1];
+    *res_xor = test_arr_xor[0];
     for (int ii = 1; ii < 32; ii++) {
         test_arr_xor[ii] = rand() % 1000;
-        res_xor ^= test_arr_xor[ii];
+        *res_xor ^= test_arr_xor[ii];
     }
 
 
@@ -396,13 +402,13 @@ int main(int argc, char* argv[]) {
     zeKernelSetGroupSize(hKernelMin, groupSizeX, 1, 1);
 
     zeKernelSetArgumentValue(hKernelMax, 0, sizeof(unsigned)*32, test_arr_max);
-    zeKernelSetArgumentValue(hKernelMax, 1, sizeof(unsigned), test_arr_max);
+    zeKernelSetArgumentValue(hKernelMax, 1, sizeof(unsigned), res_max);
     zeKernelSetArgumentValue(hKernelMax, 2, sizeof(unsigned)*32, reduce_max_sync_shared_var_arr);
     zeKernelSetArgumentValue(hKernelMax, 3, sizeof(unsigned)*32, reduce_max_sync_updated);
     zeKernelSetGroupSize(hKernelMax, groupSizeX, 1, 1);
 
     zeKernelSetArgumentValue(hKernelAnd, 0, sizeof(unsigned)*32, test_arr_and);
-    zeKernelSetArgumentValue(hKernelAnd, 1, sizeof(unsigned), res_adres_andd);
+    zeKernelSetArgumentValue(hKernelAnd, 1, sizeof(unsigned), res_and);
     zeKernelSetArgumentValue(hKernelAnd, 2, sizeof(unsigned)*32, reduce_and_sync_shared_var_arr);
     zeKernelSetArgumentValue(hKernelAnd, 3, sizeof(unsigned)*32, reduce_and_sync_updated);
     zeKernelSetGroupSize(hKernelAnd, groupSizeX, 1, 1);

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <level_zero/ze_api.h>
-#include "include/ze_utils.h"
+#include "../include/ze_utils.h"
 
 //  _
 // |_)  _  |  _  ._ ._  |  _. _|_  _
