@@ -22,12 +22,12 @@ __kernel void reduce_xor_sync(unsigned mask, unsigned value,
     *n = ret;
 }
 
-__kernel void test_reduce_xor_sync_custom(unsigned** test_arr, unsigned* res,
+__kernel void test_reduce_xor_sync_custom( __local unsigned* test_arr,  __local unsigned* res,
     __local unsigned* reduce_xor_sync_shared_var_arr, __local unsigned* reduce_xor_sync_updated) {
     int tid = get_global_id(0); // threadIdx.x;
     __local unsigned n;
-    unsigned ret = reduce_xor_sync(0xffffffff, (*test_arr)[tid],
+    reduce_xor_sync(0xffffffff, (test_arr)[tid],
         reduce_xor_sync_shared_var_arr, reduce_xor_sync_updated, &n);
-    if (ret != *res)
+    if (n != *res)
         printf("Custom thread %d failed.\n", tid);
 }
