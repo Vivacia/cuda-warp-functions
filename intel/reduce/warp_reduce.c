@@ -241,7 +241,7 @@ int main(int argc, char* argv[]) {
         ZE_STRUCTURE_TYPE_KERNEL_DESC,
         NULL,
         0, // flags
-        "test_shfl_down_sync_custom"
+        "test_reduce_min_sync_custom"
     };
 
     ze_kernel_desc_t kernelDescMax = {
@@ -255,7 +255,7 @@ int main(int argc, char* argv[]) {
         ZE_STRUCTURE_TYPE_KERNEL_DESC,
         NULL,
         0, // flags
-        "test_reduce_min_sync_custom"
+        "test_reduce_and_sync_custom"
     };
 
     ze_kernel_desc_t kernelDescOr = {

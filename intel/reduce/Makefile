@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g -O2 -lze_loader -Wall
-BINARIES=reduce reduce_add_sync.ar reduce_min_sync.ar reduce_max_sync.ar reduce_and_sync.ar reduce_or_sync.ar reduce_xor_sync.ar
+BINARIES=reduce reduce_add.ar reduce_min.ar reduce_max.ar reduce_and.ar reduce_or.ar reduce_xor.ar
 all: $(BINARIES)
 
 run: $(addprefix run_, $(BINARIES))
@@ -8,25 +8,25 @@ run: $(addprefix run_, $(BINARIES))
 clean:
         rm -f -- $(BINARIES) reduce
 
-reduce_add_sync.ar: opencl/reduce_add_sync.cl
+reduce_add.ar: opencl/reduce_add.cl
         ocloc compile -file $^ -device \*
 
-reduce_min_sync.ar: opencl/reduce_min_sync.cl
+reduce_min.ar: opencl/reduce_min.cl
         ocloc compile -file $^ -device \*
 
-reduce_max_sync.ar: opencl/reduce_max_sync.cl
+reduce_max.ar: opencl/reduce_max.cl
         ocloc compile -file $^ -device \*
 
-reduce_and_sync.ar: opencl/reduce_and_sync.cl
+reduce_and.ar: opencl/reduce_and.cl
         ocloc compile -file $^ -device \*
 
-reduce_or_sync.ar: opencl/reduce_or_sync.cl
+reduce_or.ar: opencl/reduce_or.cl
         ocloc compile -file $^ -device \*
 
-reduce_xor_sync.ar: opencl/reduce_xor_sync.cl
+reduce_xor.ar: opencl/reduce_xor.cl
         ocloc compile -file $^ -device \*
 
-reduce: warp_shuffle.c ze_utils.c
+reduce: warp_reduce.c ze_utils.c
                 $(CC) $^ $(CFLAGS) -o $@
 
 run_reduce: reduce

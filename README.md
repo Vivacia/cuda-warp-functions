@@ -1,4 +1,7 @@
 ## cuda-warp-functions
+Use the intel folder for Level Zero implementations. The intel folder should be placed in the same directory as the folder containing level-zero code. https://github.com/oneapi-src/level-zero
+
+NOTE - activemask() in Level Zero currently does not work - there are two versions of the OpenCL snippet. The issue here is that the OpenCL kernel needs to wait for all threads to execute the activemask() function but there is no way to determine whether a thread has finished executing the function, or even entered it. With activemask(), not all threads exit the function normally. The original implementation depended on a timer that determined the active threads after 10000 cycles from the first thread entering activemask(). However, in OpenCL, there is no way to count the number of cycles that have elapsed. Another method could be to perform busy work to wait for the threads to get through the function. But this does not guarantee that activemask() will provide the correct results.
 ### warp shuffle functions
 - unsigned shfl_up_sync(unsigned mask, unsigned var, unsigned int delta, int width=warpSize)
 - unsigned shfl_down_sync(unsigned mask, unsigned var, unsigned int delta, int width=warpSize)

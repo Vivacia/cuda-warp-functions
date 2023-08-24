@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g -O2 -lze_loader -Wall
-BINARIES=vote all_sync.ar any_sync.ar ballot_sync.ar activemask.ar
+BINARIES=vote all_sync.ar any_sync.ar ballot_sync.ar # activemask.ar
 all: $(BINARIES)
 
 run: $(addprefix run_, $(BINARIES))
@@ -17,8 +17,8 @@ any_sync.ar: opencl/any_sync.cl
 ballot_sync.ar: opencl/ballot_sync.cl
         ocloc compile -file $^ -device \*
 
-activemask.ar: opencl/activemask.cl
-        ocloc compile -file $^ -device \*
+# activemask.ar: opencl/activemask.cl
+#         ocloc compile -file $^ -device \*
 
 vote: warp_vote.c ze_utils.c
                 $(CC) $^ $(CFLAGS) -o $@
