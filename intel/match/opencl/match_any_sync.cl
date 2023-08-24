@@ -1,4 +1,4 @@
-__kernel void match_any_sync(unsigned mask, __local int *value, __local int *val
+__kernel void match_any_sync(unsigned mask, __local int *value,
     __local int match_any_sync_shared_var_arr[], __local int match_any_sync_updated[],
     __local int *val) {
     int tid = get_global_id(0);
@@ -24,7 +24,9 @@ __kernel void match_any_sync(unsigned mask, __local int *value, __local int *val
 __kernel void test_match_any_sync_custom_simple(__local int match_any_sync_shared_var_arr[],
     __local int match_any_sync_updated[]) {
     __local int ret;
-    match_any_sync(0xffffffff, 0, match_any_sync_shared_var_arr, match_any_sync_updated, &ret);
+    __local int val;
+    val = 0;
+    match_any_sync(0xffffffff, &val, match_any_sync_shared_var_arr, match_any_sync_updated, &ret);
     printf("Custom thread %zu final value = %d\n", get_global_id(0), ret);
 }
 
@@ -32,14 +34,17 @@ __kernel void test_match_any_sync_custom_alternate(__local int match_any_sync_sh
     __local int match_any_sync_updated[]) {
     int tid = get_global_id(0);
     __local int ret;
-    match_any_sync(0xffffffff, tid % 3, match_any_sync_shared_var_arr, match_any_sync_updated, &ret);
-    printf("Custom thread %zu final value = %d\n", tid, ret);
+    __local int val;
+    val = tid % 3;
+    match_any_sync(0xffffffff, &val, match_any_sync_shared_var_arr, match_any_sync_updated, &ret);
+    printf("Custom thread %d final value = %d\n", tid, ret);
 }
 
-__kernel void test_match_any_sync_custom_unique(__local int val, __local int match_any_sync_shared_var_arr[],
-    __local int match_any_sync_updated[]) {
-    atomic_store(&val, 1+val);
-    __local int ret;
-    match_any_sync(0xffffffff, val, match_any_sync_shared_var_arr, match_any_sync_updated, &ret);
-    printf("Custom thread %zu final value = %d\n", get_global_id(0), ret);
-}
+// atomic_store not available on JLSE device
+// __kernel void test_match_any_sync_custom_unique(__local int val, __local int match_any_sync_shared_var_arr[],
+//     __local int match_any_sync_updated[]) {
+//     atomic_store(&val, 1+val);
+//     __local int ret;
+//     match_any_sync(0xffffffff, val, match_any_sync_shared_var_arr, match_any_sync_updated, &ret);
+//     printf("Custom thread %zu final value = %d\n", get_global_id(0), ret);
+// }
